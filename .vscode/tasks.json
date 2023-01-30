@@ -1,30 +1,5 @@
 {
     "tasks": [
-        {
-            "type": "cppbuild",
-            "label": "clangbuild",
-            "command": "/usr/bin/clang++",
-            "args": [
-                "-std=c++20",
-                "-fcolor-diagnostics",
-                "-fansi-escape-codes",
-                "-g",
-                "${file}",
-                "-o",
-                "${fileDirname}/build/${fileBasenameNoExtension}"
-            ],
-            "options": {
-                "cwd": "${fileDirname}"
-            },
-            "problemMatcher": [
-                "$gcc"
-            ],
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "detail": "C++ Build Pretask designed for use with Apple Clang. Uses C++ standard 20 by default. Passes to the compiler a single source file. Useful for projects with multiple tasks/problems where each problem is in it's own isolated file."
-        },
         // {
         //     "type": "cppbuild",
         //     "label": "clangbuild",
@@ -34,7 +9,7 @@
         //         "-fcolor-diagnostics",
         //         "-fansi-escape-codes",
         //         "-g",
-        //         "${fileDirname}/**.cpp",
+        //         "${file}",
         //         "-o",
         //         "${fileDirname}/build/${fileBasenameNoExtension}"
         //     ],
@@ -48,17 +23,18 @@
         //         "kind": "build",
         //         "isDefault": true
         //     },
-        //     "detail": "C++ Build Pretask designed for use with Apple Clang. Uses C++ standard 20 by default. Useful for large projects where a single task/sub-project may be split up into many files. If this is the case and there are many 'sub-projects' then put each project into a single parent folder."
+        //     "detail": "C++ Build Pretask designed for use with Apple Clang. Uses C++ standard 20 by default. Passes to the compiler a single source file. Useful for projects with multiple tasks/problems where each problem is in it's own isolated file."
         // },
         {
             "type": "cppbuild",
-            "label": "gccbuild",
-            "command": "/usr/bin/g++-10",
+            "label": "clangbuild",
+            "command": "/usr/bin/clang++",
             "args": [
                 "-std=c++20",
-                "-fdiagnostics-color=always",
+                "-fcolor-diagnostics",
+                "-fansi-escape-codes",
                 "-g",
-                "${file}",
+                "${fileDirname}/**.cpp",
                 "-o",
                 "${fileDirname}/build/${fileBasenameNoExtension}"
             ],
@@ -70,9 +46,9 @@
             ],
             "group": {
                 "kind": "build",
-                "isDefault": false
+                "isDefault": true
             },
-            "detail": "C++ Build Pretask. Optimized for use with Debian Bullseye GCC. Uses C++ standard 20 by default. Passes to the compiler a single source file. Useful for projects with multiple tasks/problems where each problem is in it's own isolated file."
+            "detail": "C++ Build Pretask designed for use with Apple Clang. Uses C++ standard 20 by default. Useful for large projects where a single task/sub-project may be split up into many files. If this is the case and there are many 'sub-projects' then put each project into a single parent folder."
         },
         // {
         //     "type": "cppbuild",
@@ -82,7 +58,7 @@
         //         "-std=c++20",
         //         "-fdiagnostics-color=always",
         //         "-g",
-        //         "${fileDirname}/**.cpp",
+        //         "${file}",
         //         "-o",
         //         "${fileDirname}/build/${fileBasenameNoExtension}"
         //     ],
@@ -96,8 +72,32 @@
         //         "kind": "build",
         //         "isDefault": false
         //     },
-        //     "detail": "C++ Build Pretask. Optimized for use with Debian Bullseye GCC. Uses C++ standard 20 by default. Useful for large projects where a single task/sub-project may be split up into many files. If this is the case and there are many 'sub-projects' then put each project into a single parent folder."
-        // }
+        //     "detail": "C++ Build Pretask. Optimized for use with Debian Bullseye GCC. Uses C++ standard 20 by default. Passes to the compiler a single source file. Useful for projects with multiple tasks/problems where each problem is in it's own isolated file."
+        // },
+        {
+            "type": "cppbuild",
+            "label": "gccbuild",
+            "command": "/usr/bin/g++-10",
+            "args": [
+                "-std=c++20",
+                "-fdiagnostics-color=always",
+                "-g",
+                "${fileDirname}/**.cpp",
+                "-o",
+                "${fileDirname}/build/${fileBasenameNoExtension}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}"
+            },
+            "problemMatcher": [
+                "$gcc"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            },
+            "detail": "C++ Build Pretask. Optimized for use with Debian Bullseye GCC. Uses C++ standard 20 by default. Useful for large projects where a single task/sub-project may be split up into many files. If this is the case and there are many 'sub-projects' then put each project into a single parent folder."
+        }
     ],
     "version": "2.0.0"
 }
