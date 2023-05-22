@@ -25,6 +25,18 @@ struct Chess
 
     void initialize()
     {
+        string player1;
+        string player2;
+        
+        cout << "Player 1 name: ";
+        cin >> player1;
+
+        cout << "Player 2 name: ";
+        cin >> player2;
+        
+        player_names[0] = player1;
+        player_names[2] = player2;
+
         char layout1[] = "rnbqkbnr";
         char layout2[] = "pppppppp";
 
@@ -95,36 +107,36 @@ private:
     }
 
 public:
-    void render() {
+    void render(const char (&board)[8][8]) {
         render_header_row();
 
         for (int i = 0; i < 8; i++) {
-            render_data_row(chess->board[i], i);
+            render_data_row(board[i], i);
         }
 
         render_footer_row();
     }
 
-    void ask_for_movement() {
+    void ask_for_movement(Chess &chessController) {
         string piece;
         string moveTo;
-        int x;
-        int y;
-        int i;
-        int j;
+        int x = 0;
+        int y = 0;
+        int i = 0;
+        int j = 0;
 
         cout << "Piece to move: ";
         cin >> piece;
         cout << "Move to: ";
         cin >> moveTo;
 
-        if (97 <= piece[0] <= 104) x = piece[0] - 97;
-        if (49 <= piece[1] <= 57) y = piece[1] - 49;
+        if (97 <= piece[0] && piece[0] <= 104) y = piece[0] - 97;
+        if (49 <= piece[1] && piece[1] <= 57) x = piece[1] - 49;
 
-        if (97 <= moveTo[0] <= 104) i = piece[0] - 97;
-        if (49 <= moveTo[1] <= 57) j = piece[1] - 49;
+        if (97 <= moveTo[0] && moveTo[0] <= 104) j = moveTo[0] - 97;
+        if (49 <= moveTo[1] && moveTo[1] <= 57) i = moveTo[1] - 49;
 
-        chess->move(x,y,i,j);
+        chessController.move(x,y,i,j);
     }
 
     
@@ -144,11 +156,11 @@ int main()
 
     C.print_players();
 
-    renderer.render();
+    renderer.render(C.board);
 
     while (true) {
-        renderer.ask_for_movement();
-        renderer.render();
+        renderer.ask_for_movement(C);
+        renderer.render(C.board);
     }
 
     return 0;
