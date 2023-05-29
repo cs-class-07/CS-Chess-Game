@@ -214,6 +214,35 @@ private:
         return true;
     }
 
+    bool checkRook() {
+        if (preRow != postRow && preCol != postCol) return false;
+        if (preRow != postRow && preCol == postCol) { // Vertical (rows) movement
+            if (preRow > postRow) {
+                for (int i = preRow - 1; i > postRow; i--) { // Upward movement
+                    if (chess->board[i][postCol] != ' ') return false;
+                }
+            } else {
+                for (int i = preRow + 1; i < postRow; i++) { // Downward movement
+                    if (chess->board[i][postCol] != ' ') return false;
+                }
+            }
+        } else if (preRow == postRow && preCol != postCol) { // Horizontal (across/columns) movement
+            if (preCol > postCol) {
+                for (int i = preCol - 1; i > postCol; i--) { // Leftward movement
+                    if (chess->board[postRow][i] != ' ') return false;
+                }
+            } else {
+                for (int i = preCol + 1; i < postCol; i++) { // Rightward movement
+                    if (chess->board[postRow][i] != ' ') return false;
+                }
+            }
+        }
+
+        if (chess->getPlayingPlayer() == this->getPlayerForPiece(chess->board[postRow][postCol])) return false;
+
+        return true;
+    }
+
 public:
     Player getPlayerForPiece(const char &piece) {
         if (piece >= 65 && piece <= 90) return Player::BOTTOM;
@@ -239,6 +268,7 @@ public:
         if (preConversion == 'k' || preConversion == 'K') piece = Piece::KING;
 
         if (piece == Piece::PAWN && !checkPawn()) return false;
+        if (piece == Piece::ROOK && !checkRook()) return false;
         return true;
     }
 
