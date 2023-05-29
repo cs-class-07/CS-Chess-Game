@@ -167,6 +167,7 @@ public:
 
         cout << "Piece to move: ";
         cin >> piece;
+        if (piece == "exit") exit(0);
         if (97 <= piece[0] && piece[0] <= 104) y = piece[0] - 97;
         if (49 <= piece[1] && piece[1] <= 57) x = piece[1] - 49;
 
@@ -177,7 +178,7 @@ public:
 
         cout << "Move to: ";
         cin >> moveTo;
-
+        if (moveTo == "exit") exit(0);
         if (97 <= moveTo[0] && moveTo[0] <= 104) j = moveTo[0] - 97;
         if (49 <= moveTo[1] && moveTo[1] <= 57) i = moveTo[1] - 49;
 
