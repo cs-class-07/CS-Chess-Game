@@ -14,11 +14,17 @@ enum class Piece {
     NOTHING
 };
 
+enum class Player {
+    TOP = 1,
+    BOTTOM = 0,
+    NONE = 2
+};
+
 class Chess
 {
 private:
     string playerNames[2];
-    bool playingPlayer = false; // False is bottom player, true is top player
+    Player playingPlayer = Player::BOTTOM; // 0 is bottom player, 1 is top player
 
 public:
     char board[8][8];
@@ -37,16 +43,18 @@ public:
         playerNames[1] = "player red";
     }
 
-    bool getPlayingPlayer() {
+    Player getPlayingPlayer() {
         return playingPlayer;
     }
 
     string getPlayingPlayerWithName() {
-        return playerNames[playingPlayer];
+        if (playingPlayer == Player::NONE) return string();
+        return playerNames[static_cast<int>(playingPlayer)];
     }
 
     void switchPlayer() {
-        playingPlayer = !playingPlayer;
+        if (playingPlayer == Player::BOTTOM) playingPlayer = Player::TOP;
+        else if (playingPlayer == Player::TOP) playingPlayer = Player::BOTTOM;
     }
 
     void initialize()
@@ -185,7 +193,7 @@ private:
     int postCol;
 
     bool checkPawn() {
-        if (chess->getPlayingPlayer() == 0) {
+        if (chess->getPlayingPlayer() == Player::BOTTOM) {
             if (postRow + 1 != preRow) return false;
         } else {
             if (postRow - 1 != preRow) return false;
@@ -197,6 +205,12 @@ private:
     }
 
 public:
+    Player getPlayerForPiece(const char &piece) {
+        if (piece >= 65 && piece <= 90) return Player::BOTTOM;
+        else if (piece >= 97 && piece <= 122) return Player::TOP;
+        else return Player::NONE;
+    }
+
     bool checkMovement(const tuple<int, int, int, int> &input) {
         preRow = get<0>(input);
         preCol = get<1>(input);
