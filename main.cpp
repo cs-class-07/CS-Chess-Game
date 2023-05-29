@@ -151,7 +151,12 @@ public:
         render_footer_row();
     }
 
-    tuple<int, int, int, int> ask_for_movement() {
+    tuple<int, int, int, int> ask_for_movement(const int recursion) {
+        if (recursion > 9) {
+            cout << "You have passed too many invalid movements, passing up turn" << endl;
+            return make_tuple(0,0,0,0);
+        }
+
         string piece;
         string moveTo;
 
@@ -167,7 +172,7 @@ public:
 
         if (chess->board[x][y] == ' ') {
             cout << "No piece at position" << endl;
-            return this->ask_for_movement();
+            return this->ask_for_movement(recursion + 1);
         }
 
         cout << "Move to: ";
@@ -175,6 +180,11 @@ public:
 
         if (97 <= moveTo[0] && moveTo[0] <= 104) j = moveTo[0] - 97;
         if (49 <= moveTo[1] && moveTo[1] <= 57) i = moveTo[1] - 49;
+
+        if (x == i && y == j) {
+            cout << "Cannot move piece to current position" << endl;
+            return this->ask_for_movement(recursion + 1);
+        }
 
         return make_tuple(x, y, i, j);
     }
@@ -217,7 +227,9 @@ public:
         postRow = get<2>(input);
         postCol = get<3>(input);
 
-        Piece piece;
+        if (preRow == 0 && preCol == 0 && postRow == 0 && postCol == 0) return true;
+
+        Piece piece = Piece::NOTHING;
         char preConversion = (*chess).board[preRow][preCol];
         if (preConversion == 'p' || preConversion == 'P') piece = Piece::PAWN;
         if (preConversion == 'r' || preConversion == 'R') piece = Piece::ROOK;
@@ -252,7 +264,7 @@ int main()
     while (true) {
         cout << "Current player: " << chess.getPlayingPlayerWithName() << endl;
 
-        tuple<int, int, int, int> result = renderer.ask_for_movement();
+        tuple<int, int, int, int> result = renderer.ask_for_movement(0);
         if (engine.checkMovement(result)) {
             chess.move(result);
             renderer.render();
