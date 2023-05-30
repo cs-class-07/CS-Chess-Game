@@ -136,6 +136,7 @@ private:
 
     bool check_rook() {
         if (pre_row != post_row && pre_col != post_col) return false;
+
         if (pre_row != post_row && pre_col == post_col) { // Vertical (rows) movement
             if (pre_row > post_row) {
                 for (int i = pre_row - 1; i > post_row; i--) { // Upward movement
@@ -169,6 +170,50 @@ private:
         }
 
         return false;
+    }
+
+    bool check_bishop() {
+        if (abs(pre_row - post_row) != abs(pre_col - post_col)) return false;
+
+        if (pre_row > post_row) { // Upward movement
+            if (pre_col > post_col) { // Leftward movement
+
+                for (int i = pre_row - 1; i > post_row; i--) {
+                    for (int j = pre_col - 1; j > post_col; j--) {
+                        if (chess->board[i][j] != ' ') return false;
+                    }
+                }
+
+            } else { // Rightward movement
+
+                for (int i = pre_row - 1; i > post_row; i--) {
+                    for (int j = pre_col + 1; j < post_col; j++) {
+                        if (chess->board[i][j] != ' ') return false;
+                    }
+                }
+
+            }
+        } else { // Downward movement
+            if (pre_col > post_col) { // Leftward movement
+
+                for (int i = pre_row + 1; i < post_row; i++) {
+                    for (int j = pre_col - 1; j > post_col; j--) {
+                        if (chess->board[i][j] != ' ') return false;
+                    }
+                }
+
+            } else { // Rightward movement
+
+                for (int i = pre_row + 1; i < post_row; i++) {
+                    for (int j = pre_col + 1; j < post_col; j++) {
+                        if (chess->board[i][j] != ' ') return false;
+                    }
+                }
+
+            }
+        }
+
+        return true;
     }
 
 public:
@@ -206,6 +251,8 @@ public:
         if (piece == Piece::PAWN && !check_pawn()) return false;
         if (piece == Piece::ROOK && !check_rook()) return false;
         if (piece == Piece::NIGHT && !check_night()) return false;
+        if (piece == Piece::BISHOP && ! check_bishop()) return false;
+
         return true;
     }
 
