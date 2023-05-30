@@ -23,8 +23,8 @@ enum class Player {
 class Chess
 {
 private:
-    string playerNames[2];
-    Player playingPlayer = Player::BOTTOM; // 0 is bottom player, 1 is top player
+    string player_names[2];
+    Player playing_player = Player::BOTTOM; // 0 is bottom player, 1 is top player
 
 public:
     char board[8][8];
@@ -39,26 +39,26 @@ public:
             }
         }
 
-        playerNames[0] = "player blue";
-        playerNames[1] = "player red";
+        player_names[0] = "player blue";
+        player_names[1] = "player red";
     }
 
-    Player getPlayingPlayer() {
-        return playingPlayer;
+    Player get_playing_player() {
+        return playing_player;
     }
 
-    string getPlayingPlayerWithName() {
-        if (playingPlayer == Player::NONE) return string();
-        return playerNames[static_cast<int>(playingPlayer)];
+    string get_playing_player_name() {
+        if (playing_player == Player::NONE) return string();
+        return player_names[static_cast<int>(playing_player)];
     }
 
-    void setPlayingPlayer(Player player) { // For debugging purposes
-        playingPlayer = player;
+    void set_playing_player(Player player) { // For debugging purposes
+        playing_player = player;
     }
 
-    void switchPlayer() {
-        if (playingPlayer == Player::BOTTOM) playingPlayer = Player::TOP;
-        else if (playingPlayer == Player::TOP) playingPlayer = Player::BOTTOM;
+    void switch_player() {
+        if (playing_player == Player::BOTTOM) playing_player = Player::TOP;
+        else if (playing_player == Player::TOP) playing_player = Player::BOTTOM;
     }
 
     void initialize()
@@ -72,8 +72,8 @@ public:
         // cout << "Player 2 name: ";
         // cin >> player2;
         
-        // playerNames[0] = player1;
-        // playerNames[1] = player2;
+        // player_names[0] = player1;
+        // player_names[1] = player2;
 
         char layout1[] = "rnbqkbnr";
         char layout2[] = "pppppppp";
@@ -109,8 +109,8 @@ public:
 
     void print_players()
     {
-        cout << "Player 1's name is " << playerNames[0] << endl
-             << "Player 2's name is " << playerNames[1] << endl;
+        cout << "Player 1's name is " << player_names[0] << endl
+             << "Player 2's name is " << player_names[1] << endl;
     }
 };
 
@@ -191,7 +191,7 @@ public:
             return this->ask_for_movement(recursion + 1);
         }
 
-        if (Engine::getPlayerForPiece(chess->board[x][y]) == Engine::getPlayerForPiece(chess->board[i][j])) {
+        if (Engine::get_player_for_piece(chess->board[x][y]) == Engine::get_player_for_piece(chess->board[i][j])) {
             cout << "Cannot move piece to other pieces of same player (side)" << endl;
             return this->ask_for_movement(recursion + 1);
         }
@@ -212,8 +212,8 @@ private:
     int postRow;
     int postCol;
 
-    bool checkPawn() {
-        if (this->getPlayerForPiece() == Player::BOTTOM) {
+    bool check_pawn() {
+        if (this->get_player_for_piece() == Player::BOTTOM) {
             if (postRow + 1 != preRow) return false;
         } else {
             if (postRow - 1 != preRow) return false;
@@ -224,7 +224,7 @@ private:
         return true;
     }
 
-    bool checkRook() {
+    bool check_rook() {
         if (preRow != postRow && preCol != postCol) return false;
         if (preRow != postRow && preCol == postCol) { // Vertical (rows) movement
             if (preRow > postRow) {
@@ -248,19 +248,19 @@ private:
             }
         }
 
-        if (this->getPlayerForPiece() == this->getPlayerForPiece(chess->board[postRow][postCol])) return false;
+        if (this->get_player_for_piece() == this->get_player_for_piece(chess->board[postRow][postCol])) return false;
 
         return true;
     }
 
 public:
-    static Player getPlayerForPiece(const char &piece) {
+    static Player get_player_for_piece(const char &piece) {
         if (piece >= 65 && piece <= 90) return Player::BOTTOM;
         else if (piece >= 97 && piece <= 122) return Player::TOP;
         else return Player::NONE;
     }
 
-    Player getPlayerForPiece() {
+    Player get_player_for_piece() {
         const char piece = chess->board[preRow][preCol];
 
         if (piece >= 65 && piece <= 90) return Player::BOTTOM;
@@ -268,7 +268,7 @@ public:
         else return Player::NONE;
     }
 
-    bool checkMovement(const tuple<int, int, int, int> &input) {
+    bool check_movement(const tuple<int, int, int, int> &input) {
         preRow = get<0>(input);
         preCol = get<1>(input);
         postRow = get<2>(input);
@@ -285,8 +285,8 @@ public:
         if (preConversion == 'q' || preConversion == 'Q') piece = Piece::QUEEN;
         if (preConversion == 'k' || preConversion == 'K') piece = Piece::KING;
 
-        if (piece == Piece::PAWN && !checkPawn()) return false;
-        if (piece == Piece::ROOK && !checkRook()) return false;
+        if (piece == Piece::PAWN && !check_pawn()) return false;
+        if (piece == Piece::ROOK && !check_rook()) return false;
         return true;
     }
 
@@ -304,7 +304,7 @@ int main(int argc, char* argv[])
     if (argc >= 2) {
         for (int i = 1; i < argc; i++) {
             if (strcmp(argv[i], "--debug") == 0) {
-                chess.setPlayingPlayer(Player::NONE);
+                chess.set_playing_player(Player::NONE);
             }
         }
     }
@@ -318,14 +318,14 @@ int main(int argc, char* argv[])
     renderer.render();
 
     while (true) {
-        if (chess.getPlayingPlayer() == Player::NONE) cout << "No player playing [DEBUG MODE ENABLED]" << endl;
-        else cout << "Current player: " << chess.getPlayingPlayerWithName() << endl;
+        if (chess.get_playing_player() == Player::NONE) cout << "No player playing [DEBUG MODE ENABLED]" << endl;
+        else cout << "Current player: " << chess.get_playing_player_name() << endl;
 
         tuple<int, int, int, int> result = renderer.ask_for_movement(0);
-        if (engine.checkMovement(result)) {
+        if (engine.check_movement(result)) {
             chess.move(result);
             renderer.render();
-            chess.switchPlayer();
+            chess.switch_player();
         } else {
             cout << "Invalid movement!" << endl;
         }
