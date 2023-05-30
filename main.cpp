@@ -161,6 +161,16 @@ private:
         return true;
     }
 
+    bool check_night() {
+        if (abs(pre_row - post_row) == 2) { // Vertical movements of 2 and horizontal movements of 1
+            if (abs(pre_col - post_col) == 1) return true;
+        } else if (abs(pre_col - post_col) == 2) { // Horizontal movements of 2 and vertical movements of 1
+            if (abs(pre_row - post_row) == 1) return true;
+        }
+
+        return false;
+    }
+
 public:
     static Player get_player_for_piece(const char &piece) {
         if (piece >= 65 && piece <= 90) return Player::BOTTOM;
@@ -195,6 +205,7 @@ public:
 
         if (piece == Piece::PAWN && !check_pawn()) return false;
         if (piece == Piece::ROOK && !check_rook()) return false;
+        if (piece == Piece::NIGHT && !check_night()) return false;
         return true;
     }
 
