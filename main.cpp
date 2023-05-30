@@ -208,7 +208,7 @@ private:
     int postCol;
 
     bool checkPawn() {
-        if (chess->getPlayingPlayer() == Player::BOTTOM) {
+        if (this->getPlayerForPiece() == Player::BOTTOM) {
             if (postRow + 1 != preRow) return false;
         } else {
             if (postRow - 1 != preRow) return false;
@@ -243,13 +243,21 @@ private:
             }
         }
 
-        if (chess->getPlayingPlayer() == this->getPlayerForPiece(chess->board[postRow][postCol])) return false;
+        if (this->getPlayerForPiece() == this->getPlayerForPiece(chess->board[postRow][postCol])) return false;
 
         return true;
     }
 
 public:
     Player getPlayerForPiece(const char &piece) {
+        if (piece >= 65 && piece <= 90) return Player::BOTTOM;
+        else if (piece >= 97 && piece <= 122) return Player::TOP;
+        else return Player::NONE;
+    }
+
+    Player getPlayerForPiece() {
+        const char piece = chess->board[preRow][preCol];
+
         if (piece >= 65 && piece <= 90) return Player::BOTTOM;
         else if (piece >= 97 && piece <= 122) return Player::TOP;
         else return Player::NONE;
