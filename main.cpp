@@ -162,7 +162,7 @@ public:
         }
 
         string piece;
-        string moveTo;
+        string move_to;
 
         int x = 0;
         int y = 0;
@@ -181,10 +181,10 @@ public:
         }
 
         cout << "Move to: ";
-        cin >> moveTo;
-        if (moveTo == "exit") exit(0);
-        if (97 <= moveTo[0] && moveTo[0] <= 104) j = moveTo[0] - 97;
-        if (49 <= moveTo[1] && moveTo[1] <= 57) i = moveTo[1] - 49;
+        cin >> move_to;
+        if (move_to == "exit") exit(0);
+        if (97 <= move_to[0] && move_to[0] <= 104) j = move_to[0] - 97;
+        if (49 <= move_to[1] && move_to[1] <= 57) i = move_to[1] - 49;
 
         if (x == i && y == j) {
             cout << "Cannot move piece to current position (itself)" << endl;
@@ -207,48 +207,48 @@ public:
 class Engine {
 private:
     Chess * chess;
-    int preRow;
-    int preCol;
-    int postRow;
-    int postCol;
+    int pre_row;
+    int pre_col;
+    int post_row;
+    int post_col;
 
     bool check_pawn() {
         if (this->get_player_for_piece() == Player::BOTTOM) {
-            if (postRow + 1 != preRow) return false;
+            if (post_row + 1 != pre_row) return false;
         } else {
-            if (postRow - 1 != preRow) return false;
+            if (post_row - 1 != pre_row) return false;
         }
 
-        if (preCol == postCol && chess->board[postRow][postCol] != ' ') return false;
-        if (preCol != postCol && chess->board[postRow][postCol] == ' ') return false;
+        if (pre_col == post_col && chess->board[post_row][post_col] != ' ') return false;
+        if (pre_col != post_col && chess->board[post_row][post_col] == ' ') return false;
         return true;
     }
 
     bool check_rook() {
-        if (preRow != postRow && preCol != postCol) return false;
-        if (preRow != postRow && preCol == postCol) { // Vertical (rows) movement
-            if (preRow > postRow) {
-                for (int i = preRow - 1; i > postRow; i--) { // Upward movement
-                    if (chess->board[i][postCol] != ' ') return false;
+        if (pre_row != post_row && pre_col != post_col) return false;
+        if (pre_row != post_row && pre_col == post_col) { // Vertical (rows) movement
+            if (pre_row > post_row) {
+                for (int i = pre_row - 1; i > post_row; i--) { // Upward movement
+                    if (chess->board[i][post_col] != ' ') return false;
                 }
             } else {
-                for (int i = preRow + 1; i < postRow; i++) { // Downward movement
-                    if (chess->board[i][postCol] != ' ') return false;
+                for (int i = pre_row + 1; i < post_row; i++) { // Downward movement
+                    if (chess->board[i][post_col] != ' ') return false;
                 }
             }
-        } else if (preRow == postRow && preCol != postCol) { // Horizontal (across/columns) movement
-            if (preCol > postCol) {
-                for (int i = preCol - 1; i > postCol; i--) { // Leftward movement
-                    if (chess->board[postRow][i] != ' ') return false;
+        } else if (pre_row == post_row && pre_col != post_col) { // Horizontal (across/columns) movement
+            if (pre_col > post_col) {
+                for (int i = pre_col - 1; i > post_col; i--) { // Leftward movement
+                    if (chess->board[post_row][i] != ' ') return false;
                 }
             } else {
-                for (int i = preCol + 1; i < postCol; i++) { // Rightward movement
-                    if (chess->board[postRow][i] != ' ') return false;
+                for (int i = pre_col + 1; i < post_col; i++) { // Rightward movement
+                    if (chess->board[post_row][i] != ' ') return false;
                 }
             }
         }
 
-        if (this->get_player_for_piece() == this->get_player_for_piece(chess->board[postRow][postCol])) return false;
+        if (this->get_player_for_piece() == this->get_player_for_piece(chess->board[post_row][post_col])) return false;
 
         return true;
     }
@@ -261,7 +261,7 @@ public:
     }
 
     Player get_player_for_piece() {
-        const char piece = chess->board[preRow][preCol];
+        const char piece = chess->board[pre_row][pre_col];
 
         if (piece >= 65 && piece <= 90) return Player::BOTTOM;
         else if (piece >= 97 && piece <= 122) return Player::TOP;
@@ -269,21 +269,21 @@ public:
     }
 
     bool check_movement(const tuple<int, int, int, int> &input) {
-        preRow = get<0>(input);
-        preCol = get<1>(input);
-        postRow = get<2>(input);
-        postCol = get<3>(input);
+        pre_row = get<0>(input);
+        pre_col = get<1>(input);
+        post_row = get<2>(input);
+        post_col = get<3>(input);
 
-        if (preRow == 0 && preCol == 0 && postRow == 0 && postCol == 0) return true; // Returned by the Renderer::ask_for_movement function when invalid input has been passed
+        if (pre_row == 0 && pre_col == 0 && post_row == 0 && post_col == 0) return true; // Returned by the Renderer::ask_for_movement function when invalid input has been passed
 
         Piece piece = Piece::NOTHING;
-        char preConversion = (*chess).board[preRow][preCol];
-        if (preConversion == 'p' || preConversion == 'P') piece = Piece::PAWN;
-        if (preConversion == 'r' || preConversion == 'R') piece = Piece::ROOK;
-        if (preConversion == 'n' || preConversion == 'N') piece = Piece::NIGHT;
-        if (preConversion == 'b' || preConversion == 'B') piece = Piece::BISHOP;
-        if (preConversion == 'q' || preConversion == 'Q') piece = Piece::QUEEN;
-        if (preConversion == 'k' || preConversion == 'K') piece = Piece::KING;
+        char pre_conversion = (*chess).board[pre_row][pre_col];
+        if (pre_conversion == 'p' || pre_conversion == 'P') piece = Piece::PAWN;
+        if (pre_conversion == 'r' || pre_conversion == 'R') piece = Piece::ROOK;
+        if (pre_conversion == 'n' || pre_conversion == 'N') piece = Piece::NIGHT;
+        if (pre_conversion == 'b' || pre_conversion == 'B') piece = Piece::BISHOP;
+        if (pre_conversion == 'q' || pre_conversion == 'Q') piece = Piece::QUEEN;
+        if (pre_conversion == 'k' || pre_conversion == 'K') piece = Piece::KING;
 
         if (piece == Piece::PAWN && !check_pawn()) return false;
         if (piece == Piece::ROOK && !check_rook()) return false;
