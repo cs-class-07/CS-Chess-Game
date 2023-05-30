@@ -114,96 +114,6 @@ public:
     }
 };
 
-class Renderer
-{
-private:
-    Chess * chess;
-
-    void render_header_row()
-    {
-        cout << "    a   b   c   d   e   f   g   h" << endl;
-        cout << "  ---------------------------------" << endl;
-    }
-
-    void render_data_row(const char (&row)[8], int &i)
-    {
-        cout << i + 1 << " | ";
-
-        for (int j = 0; j < 8; j++)
-        {
-            cout << row[j];
-            cout << " | ";
-        }
-
-        cout << i + 1 << endl;
-    }
-
-    void render_footer_row()
-    {
-        cout << "  ---------------------------------" << endl;
-        cout << "    a   b   c   d   e   f   g   h" << endl;
-    }
-
-public:
-    void render() {
-        render_header_row();
-
-        for (int i = 0; i < 8; i++) {
-            render_data_row(chess->board[i], i);
-        }
-
-        render_footer_row();
-    }
-
-    tuple<int, int, int, int> ask_for_movement(const int recursion) {
-        if (recursion > 9) {
-            cout << "You have passed too many invalid movements, passing up turn" << endl;
-            return make_tuple(0,0,0,0);
-        }
-
-        string piece;
-        string move_to;
-
-        int x = 0;
-        int y = 0;
-        int i = 0;
-        int j = 0;
-
-        cout << "Piece to move: ";
-        cin >> piece;
-        if (piece == "exit") exit(0);
-        if (97 <= piece[0] && piece[0] <= 104) y = piece[0] - 97;
-        if (49 <= piece[1] && piece[1] <= 57) x = piece[1] - 49;
-
-        if (chess->board[x][y] == ' ') {
-            cout << "No piece at position" << endl;
-            return this->ask_for_movement(recursion + 1);
-        }
-
-        cout << "Move to: ";
-        cin >> move_to;
-        if (move_to == "exit") exit(0);
-        if (97 <= move_to[0] && move_to[0] <= 104) j = move_to[0] - 97;
-        if (49 <= move_to[1] && move_to[1] <= 57) i = move_to[1] - 49;
-
-        if (x == i && y == j) {
-            cout << "Cannot move piece to current position (itself)" << endl;
-            return this->ask_for_movement(recursion + 1);
-        }
-
-        if (Engine::get_player_for_piece(chess->board[x][y]) == Engine::get_player_for_piece(chess->board[i][j])) {
-            cout << "Cannot move piece to other pieces of same player (side)" << endl;
-            return this->ask_for_movement(recursion + 1);
-        }
-
-        return make_tuple(x, y, i, j);
-    }
-
-    Renderer(Chess &c) {
-        chess = &c;
-    }
-};
-
 class Engine {
 private:
     Chess * chess;
@@ -291,6 +201,96 @@ public:
     }
 
     Engine(Chess &c) {
+        chess = &c;
+    }
+};
+
+class Renderer
+{
+private:
+    Chess * chess;
+
+    void render_header_row()
+    {
+        cout << "    a   b   c   d   e   f   g   h" << endl;
+        cout << "  ---------------------------------" << endl;
+    }
+
+    void render_data_row(const char (&row)[8], int &i)
+    {
+        cout << i + 1 << " | ";
+
+        for (int j = 0; j < 8; j++)
+        {
+            cout << row[j];
+            cout << " | ";
+        }
+
+        cout << i + 1 << endl;
+    }
+
+    void render_footer_row()
+    {
+        cout << "  ---------------------------------" << endl;
+        cout << "    a   b   c   d   e   f   g   h" << endl;
+    }
+
+public:
+    void render() {
+        render_header_row();
+
+        for (int i = 0; i < 8; i++) {
+            render_data_row(chess->board[i], i);
+        }
+
+        render_footer_row();
+    }
+
+    tuple<int, int, int, int> ask_for_movement(const int recursion) {
+        if (recursion > 9) {
+            cout << "You have passed too many invalid movements, passing up turn" << endl;
+            return make_tuple(0,0,0,0);
+        }
+
+        string piece;
+        string move_to;
+
+        int x = 0;
+        int y = 0;
+        int i = 0;
+        int j = 0;
+
+        cout << "Piece to move: ";
+        cin >> piece;
+        if (piece == "exit") exit(0);
+        if (97 <= piece[0] && piece[0] <= 104) y = piece[0] - 97;
+        if (49 <= piece[1] && piece[1] <= 57) x = piece[1] - 49;
+
+        if (chess->board[x][y] == ' ') {
+            cout << "No piece at position" << endl;
+            return this->ask_for_movement(recursion + 1);
+        }
+
+        cout << "Move to: ";
+        cin >> move_to;
+        if (move_to == "exit") exit(0);
+        if (97 <= move_to[0] && move_to[0] <= 104) j = move_to[0] - 97;
+        if (49 <= move_to[1] && move_to[1] <= 57) i = move_to[1] - 49;
+
+        if (x == i && y == j) {
+            cout << "Cannot move piece to current position (itself)" << endl;
+            return this->ask_for_movement(recursion + 1);
+        }
+
+        if (Engine::get_player_for_piece(chess->board[x][y]) == Engine::get_player_for_piece(chess->board[i][j])) {
+            cout << "Cannot move piece to other pieces of same player (side)" << endl;
+            return this->ask_for_movement(recursion + 1);
+        }
+
+        return make_tuple(x, y, i, j);
+    }
+
+    Renderer(Chess &c) {
         chess = &c;
     }
 };
