@@ -52,6 +52,10 @@ public:
         return playerNames[static_cast<int>(playingPlayer)];
     }
 
+    void setPlayingPlayer(Player player) { // For debugging purposes
+        playingPlayer = player;
+    }
+
     void switchPlayer() {
         if (playingPlayer == Player::BOTTOM) playingPlayer = Player::TOP;
         else if (playingPlayer == Player::TOP) playingPlayer = Player::BOTTOM;
@@ -278,11 +282,19 @@ public:
     }
 };
 
-int main()
+int main(int argc, char* argv[])
 {
     Chess chess;
     Renderer renderer(chess);
     Engine engine(chess);
+
+    if (argc >= 2) {
+        for (int i = 1; i < argc; i++) {
+            if (argv[i] == "--debug") {
+                chess.setPlayingPlayer(Player::NONE);
+            }
+        }
+    }
 
     chess.initialize();
 
@@ -293,7 +305,8 @@ int main()
     renderer.render();
 
     while (true) {
-        cout << "Current player: " << chess.getPlayingPlayerWithName() << endl;
+        if (chess.getPlayingPlayer() == Player::NONE) cout << "No player playing [DEBUG MODE ENABLED]" << endl;
+        else cout << "Current player: " << chess.getPlayingPlayerWithName() << endl;
 
         tuple<int, int, int, int> result = renderer.ask_for_movement(0);
         if (engine.checkMovement(result)) {
