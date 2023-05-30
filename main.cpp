@@ -123,7 +123,7 @@ private:
     int post_col;
 
     bool check_pawn() {
-        if (this->get_player_for_piece() == Player::BOTTOM) {
+        if (get_player_for_piece() == Player::BOTTOM) {
             if (post_row + 1 != pre_row) return false;
         } else {
             if (post_row - 1 != pre_row) return false;
@@ -157,8 +157,6 @@ private:
                 }
             }
         }
-
-        if (this->get_player_for_piece() == this->get_player_for_piece(chess->board[post_row][post_col])) return false;
 
         return true;
     }
