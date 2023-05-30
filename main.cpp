@@ -65,13 +65,13 @@ public:
     {
         // string player1;
         // string player2;
-        
+
         // cout << "Player 1 name: ";
         // cin >> player1;
 
         // cout << "Player 2 name: ";
         // cin >> player2;
-        
+
         // player_names[0] = player1;
         // player_names[1] = player2;
 
