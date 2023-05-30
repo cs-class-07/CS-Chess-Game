@@ -187,7 +187,12 @@ public:
         if (49 <= moveTo[1] && moveTo[1] <= 57) i = moveTo[1] - 49;
 
         if (x == i && y == j) {
-            cout << "Cannot move piece to current position" << endl;
+            cout << "Cannot move piece to current position (itself)" << endl;
+            return this->ask_for_movement(recursion + 1);
+        }
+
+        if (Engine::getPlayerForPiece(chess->board[x][y]) == Engine::getPlayerForPiece(chess->board[i][j])) {
+            cout << "Cannot move piece to other pieces of same player (side)" << endl;
             return this->ask_for_movement(recursion + 1);
         }
 
@@ -249,7 +254,7 @@ private:
     }
 
 public:
-    Player getPlayerForPiece(const char &piece) {
+    static Player getPlayerForPiece(const char &piece) {
         if (piece >= 65 && piece <= 90) return Player::BOTTOM;
         else if (piece >= 97 && piece <= 122) return Player::TOP;
         else return Player::NONE;
@@ -269,7 +274,7 @@ public:
         postRow = get<2>(input);
         postCol = get<3>(input);
 
-        if (preRow == 0 && preCol == 0 && postRow == 0 && postCol == 0) return true;
+        if (preRow == 0 && preCol == 0 && postRow == 0 && postCol == 0) return true; // Returned by the Renderer::ask_for_movement function when invalid input has been passed
 
         Piece piece = Piece::NOTHING;
         char preConversion = (*chess).board[preRow][preCol];
