@@ -1,8 +1,6 @@
 #include <iostream>
 #include <string>
 #include <vector>
-#include <unistd.h>
-#include <term.h>
 
 using namespace std;
 
@@ -25,7 +23,6 @@ enum class Player {
 class Chess
 {
 private:
-    // string player_names[2];
     Player playing_player = Player::BOTTOM; // 0 is bottom player, 1 is top player
 
 public:
@@ -95,12 +92,6 @@ public:
         board[get<2>(input)][get<3>(input)] = board[get<0>(input)][get<1>(input)];
         board[get<0>(input)][get<1>(input)] = ' ';
     }
-
-    // void print_players()
-    // {
-    //     cout << "Player 1's name is " << player_names[0] << endl
-    //          << "Player 2's name is " << player_names[1] << endl;
-    // }
 };
 
 class Engine {
@@ -221,9 +212,6 @@ public:
     Player get_player_for_piece() {
         const char piece = chess->board[pre_row][pre_col];
 
-        // if (piece >= 65 && piece <= 90) return Player::BOTTOM;
-        // else if (piece >= 97 && piece <= 122) return Player::TOP;
-        // else return Player::NONE;
         return Engine::get_player_for_piece(piece);
     }
 
@@ -349,16 +337,6 @@ public:
 
         return make_tuple(x, y, i, j, string());
     }
-
-    // static void clr_scr() {
-    //     // if (!cur_term) {
-    //     //     int result;
-    //     //     setupterm(NULL, STDOUT_FILENO, &result );
-    //     //     if (result <= 0) return;
-    //     // }
-
-    //     (void) putp( tigetstr( "clear" ) );
-    // }
 
     Renderer(Chess &c) {
         chess = &c;
