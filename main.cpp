@@ -221,9 +221,10 @@ public:
     Player get_player_for_piece() {
         const char piece = chess->board[pre_row][pre_col];
 
-        if (piece >= 65 && piece <= 90) return Player::BOTTOM;
-        else if (piece >= 97 && piece <= 122) return Player::TOP;
-        else return Player::NONE;
+        // if (piece >= 65 && piece <= 90) return Player::BOTTOM;
+        // else if (piece >= 97 && piece <= 122) return Player::TOP;
+        // else return Player::NONE;
+        return Engine::get_player_for_piece(piece);
     }
 
     bool check_movement(const tuple<int, int, int, int> &input) {
@@ -233,7 +234,7 @@ public:
         post_col = get<3>(input);
 
         Piece piece = Piece::NOTHING;
-        char pre_conversion = (*chess).board[pre_row][pre_col];
+        char pre_conversion = chess->board[pre_row][pre_col];
         if (pre_conversion == 'p' || pre_conversion == 'P') piece = Piece::PAWN;
         if (pre_conversion == 'r' || pre_conversion == 'R') piece = Piece::ROOK;
         if (pre_conversion == 'n' || pre_conversion == 'N') piece = Piece::NIGHT;
@@ -344,6 +345,7 @@ public:
         if (x == i && y == j) return make_tuple(0,0,0,0, "Cannot move piece to current position (itself)");
 
         if (Engine::get_player_for_piece(chess->board[x][y]) == Engine::get_player_for_piece(chess->board[i][j])) return make_tuple(0,0,0,0, "Cannot move piece to other pieces of same player (side)");
+        if (chess->get_playing_player() != Player::NONE && Engine::get_player_for_piece(chess->board[x][y]) != chess->get_playing_player()) return make_tuple(0,0,0,0, "Cannot move other player's piece");;
 
         return make_tuple(x, y, i, j, string());
     }
@@ -381,14 +383,17 @@ int main(int argc, char* argv[])
 
     cout << endl;
 
-    renderer.render();
-
-    if (chess.get_playing_player() == Player::NONE) cout << "No player playing [DEBUG MODE ENABLED]" << endl;
-    else cout << "Current player: " << chess.get_playing_player_name() << endl;
-
     string some_random_variable_that_i_needed_at_last_second = string();
 
     while (true) {
+        cout << "\033[2J\033[1;1H";
+        renderer.render();
+        cout << some_random_variable_that_i_needed_at_last_second << endl;
+        some_random_variable_that_i_needed_at_last_second = string();
+
+        if (chess.get_playing_player() == Player::NONE) cout << "No player playing [DEBUG MODE ENABLED]" << endl;
+        else cout << "Current player: " << chess.get_playing_player_name() << endl;
+
         tuple<int, int, int, int, string> result = renderer.ask_for_movement();
 
         if (!(get<0>(result) == 0 && get<1>(result) == 0 && get<2>(result) == 0 && get<3>(result) == 0)) {
@@ -397,12 +402,6 @@ int main(int argc, char* argv[])
             if (engine.check_movement(tangible_result)) {
                 chess.move(tangible_result);
                 chess.switch_player();
-                cout << "\033[2J\033[1;1H";
-                renderer.render();
-                cout << some_random_variable_that_i_needed_at_last_second << endl;
-                some_random_variable_that_i_needed_at_last_second = string();
-                if (chess.get_playing_player() == Player::NONE) cout << "No player playing [DEBUG MODE ENABLED]" << endl;
-                else cout << "Current player: " << chess.get_playing_player_name() << endl;
             } else {
                 some_random_variable_that_i_needed_at_last_second = "Supplied movement is invalid";
             }
