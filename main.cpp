@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <unistd.h>
+#include <term.h>
 
 using namespace std;
 
@@ -23,7 +25,7 @@ enum class Player {
 class Chess
 {
 private:
-    string player_names[2];
+    // string player_names[2];
     Player playing_player = Player::BOTTOM; // 0 is bottom player, 1 is top player
 
 public:
@@ -38,9 +40,6 @@ public:
                 board[i][j] = ' ';
             }
         }
-
-        player_names[0] = "player blue";
-        player_names[1] = "player red";
     }
 
     Player get_playing_player() {
@@ -49,7 +48,9 @@ public:
 
     string get_playing_player_name() {
         if (playing_player == Player::NONE) return string();
-        return player_names[static_cast<int>(playing_player)];
+        else if (playing_player == Player::BOTTOM) return "White (Bottom)";
+        else if (playing_player == Player::TOP) return "Black (Top)";
+        return string();
     }
 
     void set_playing_player(Player player) { // For debugging purposes
@@ -63,18 +64,6 @@ public:
 
     void initialize()
     {
-        // string player1;
-        // string player2;
-
-        // cout << "Player 1 name: ";
-        // cin >> player1;
-
-        // cout << "Player 2 name: ";
-        // cin >> player2;
-
-        // player_names[0] = player1;
-        // player_names[1] = player2;
-
         char layout1[] = "rnbqkbnr";
         char layout2[] = "pppppppp";
 
@@ -107,11 +96,11 @@ public:
         board[get<0>(input)][get<1>(input)] = ' ';
     }
 
-    void print_players()
-    {
-        cout << "Player 1's name is " << player_names[0] << endl
-             << "Player 2's name is " << player_names[1] << endl;
-    }
+    // void print_players()
+    // {
+    //     cout << "Player 1's name is " << player_names[0] << endl
+    //          << "Player 2's name is " << player_names[1] << endl;
+    // }
 };
 
 class Engine {
@@ -216,6 +205,12 @@ private:
         return true;
     }
 
+    bool check_king() {
+        if (abs(pre_row - post_row) > 1 || abs(pre_col - post_col) > 1) return false;
+
+        return true;
+    }
+
 public:
     static Player get_player_for_piece(const char &piece) {
         if (piece >= 65 && piece <= 90) return Player::BOTTOM;
@@ -237,8 +232,6 @@ public:
         post_row = get<2>(input);
         post_col = get<3>(input);
 
-        if (pre_row == 0 && pre_col == 0 && post_row == 0 && post_col == 0) return true; // Returned by the Renderer::ask_for_movement function when invalid input has been passed
-
         Piece piece = Piece::NOTHING;
         char pre_conversion = (*chess).board[pre_row][pre_col];
         if (pre_conversion == 'p' || pre_conversion == 'P') piece = Piece::PAWN;
@@ -251,7 +244,9 @@ public:
         if (piece == Piece::PAWN && !check_pawn()) return false;
         if (piece == Piece::ROOK && !check_rook()) return false;
         if (piece == Piece::NIGHT && !check_night()) return false;
-        if (piece == Piece::BISHOP && ! check_bishop()) return false;
+        if (piece == Piece::BISHOP && !check_bishop()) return false;
+        if (piece == Piece::QUEEN && !check_rook() && !check_bishop()) return false;
+        if (piece == Piece::KING && !check_king()) return false;
 
         return true;
     }
@@ -269,45 +264,61 @@ private:
     void render_header_row()
     {
         cout << "    a   b   c   d   e   f   g   h" << endl;
-        cout << "  ---------------------------------" << endl;
+    }
+
+    void render_dummy_row(const char placement) {
+        string char_to_be_placed_start = "┣";
+        string char_to_be_placed_end = "┫";
+        string char_to_be_placed_mid = "╋";
+        if (placement == 1 || placement == 't') {
+            char_to_be_placed_start = "┏";
+            char_to_be_placed_end = "┓";
+            char_to_be_placed_mid = "┳";
+        } else if (placement == 2 || placement == 'b') {
+            char_to_be_placed_start = "┗";
+            char_to_be_placed_end = "┛";
+            char_to_be_placed_mid = "┻";
+        }
+        
+
+        cout << "  "
+             << char_to_be_placed_start;
+        for (int i = 0; i < 7; i++) {
+        cout << "━━━" << char_to_be_placed_mid;
+        }
+        cout << "━━━"
+             << char_to_be_placed_end
+             << endl;
     }
 
     void render_data_row(const char (&row)[8], int &i)
     {
-        cout << i + 1 << " | ";
+        cout << i + 1 << " ┃ ";
 
         for (int j = 0; j < 8; j++)
         {
             cout << row[j];
-            cout << " | ";
+            cout << " ┃ ";
         }
 
         cout << i + 1 << endl;
     }
 
-    void render_footer_row()
-    {
-        cout << "  ---------------------------------" << endl;
-        cout << "    a   b   c   d   e   f   g   h" << endl;
-    }
-
 public:
     void render() {
         render_header_row();
+        render_dummy_row('t');
 
         for (int i = 0; i < 8; i++) {
             render_data_row(chess->board[i], i);
+            if (i == 7) render_dummy_row('b');
+            else render_dummy_row(0);
         }
 
-        render_footer_row();
+        render_header_row();
     }
 
-    tuple<int, int, int, int> ask_for_movement(const int recursion) {
-        if (recursion > 9) {
-            cout << "You have passed too many invalid movements, passing up turn" << endl;
-            return make_tuple(0,0,0,0);
-        }
-
+    tuple<int, int, int, int, string> ask_for_movement() {
         string piece;
         string move_to;
 
@@ -322,10 +333,7 @@ public:
         if (97 <= piece[0] && piece[0] <= 104) y = piece[0] - 97;
         if (49 <= piece[1] && piece[1] <= 57) x = piece[1] - 49;
 
-        if (chess->board[x][y] == ' ') {
-            cout << "No piece at position" << endl;
-            return this->ask_for_movement(recursion + 1);
-        }
+        if (chess->board[x][y] == ' ') return make_tuple(0,0,0,0, "No piece at position");
 
         cout << "Move to: ";
         cin >> move_to;
@@ -333,18 +341,22 @@ public:
         if (97 <= move_to[0] && move_to[0] <= 104) j = move_to[0] - 97;
         if (49 <= move_to[1] && move_to[1] <= 57) i = move_to[1] - 49;
 
-        if (x == i && y == j) {
-            cout << "Cannot move piece to current position (itself)" << endl;
-            return this->ask_for_movement(recursion + 1);
-        }
+        if (x == i && y == j) return make_tuple(0,0,0,0, "Cannot move piece to current position (itself)");
 
-        if (Engine::get_player_for_piece(chess->board[x][y]) == Engine::get_player_for_piece(chess->board[i][j])) {
-            cout << "Cannot move piece to other pieces of same player (side)" << endl;
-            return this->ask_for_movement(recursion + 1);
-        }
+        if (Engine::get_player_for_piece(chess->board[x][y]) == Engine::get_player_for_piece(chess->board[i][j])) return make_tuple(0,0,0,0, "Cannot move piece to other pieces of same player (side)");
 
-        return make_tuple(x, y, i, j);
+        return make_tuple(x, y, i, j, string());
     }
+
+    // static void clr_scr() {
+    //     // if (!cur_term) {
+    //     //     int result;
+    //     //     setupterm(NULL, STDOUT_FILENO, &result );
+    //     //     if (result <= 0) return;
+    //     // }
+
+    //     (void) putp( tigetstr( "clear" ) );
+    // }
 
     Renderer(Chess &c) {
         chess = &c;
@@ -369,24 +381,34 @@ int main(int argc, char* argv[])
 
     cout << endl;
 
-    chess.print_players();
-
     renderer.render();
 
+    if (chess.get_playing_player() == Player::NONE) cout << "No player playing [DEBUG MODE ENABLED]" << endl;
+    else cout << "Current player: " << chess.get_playing_player_name() << endl;
+
+    string some_random_variable_that_i_needed_at_last_second = string();
+
     while (true) {
-        if (chess.get_playing_player() == Player::NONE) cout << "No player playing [DEBUG MODE ENABLED]" << endl;
-        else cout << "Current player: " << chess.get_playing_player_name() << endl;
+        tuple<int, int, int, int, string> result = renderer.ask_for_movement();
 
-        tuple<int, int, int, int> result = renderer.ask_for_movement(0);
-        if (engine.check_movement(result)) {
-            chess.move(result);
-            renderer.render();
-            chess.switch_player();
+        if (!(get<0>(result) == 0 && get<1>(result) == 0 && get<2>(result) == 0 && get<3>(result) == 0)) {
+            tuple<int, int, int, int> tangible_result = make_tuple(get<0>(result), get<1>(result), get<2>(result), get<3>(result));
+
+            if (engine.check_movement(tangible_result)) {
+                chess.move(tangible_result);
+                chess.switch_player();
+                cout << "\033[2J\033[1;1H";
+                renderer.render();
+                cout << some_random_variable_that_i_needed_at_last_second << endl;
+                some_random_variable_that_i_needed_at_last_second = string();
+                if (chess.get_playing_player() == Player::NONE) cout << "No player playing [DEBUG MODE ENABLED]" << endl;
+                else cout << "Current player: " << chess.get_playing_player_name() << endl;
+            } else {
+                some_random_variable_that_i_needed_at_last_second = "Supplied movement is invalid";
+            }
         } else {
-            cout << "Invalid movement!" << endl;
+            some_random_variable_that_i_needed_at_last_second = get<4>(result);
         }
-
-        cout << endl << endl;
     }
 
     return 0;
